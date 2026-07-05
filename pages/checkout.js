@@ -7,6 +7,7 @@ import Footer from '../components/Footer'
 export default function Checkout() {
   const [cart, setCart] = useState([])
   const [cartCount, setCartCount] = useState(0)
+  const [paymentMethod, setPaymentMethod] = useState('cod') // 'cod' or 'phonepe'
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -47,6 +48,7 @@ export default function Checkout() {
     // Log order details (in production, send to backend)
     console.log('Order submitted:', {
       ...formData,
+      paymentMethod,
       items: cart,
       total: cart.reduce((sum, item) => sum + item.price, 0) + 99
     })
@@ -95,8 +97,27 @@ export default function Checkout() {
           <div className="max-w-md mx-auto text-center bg-white rounded-lg shadow-md p-8">
             <div className="text-6xl mb-4">✅</div>
             <h1 className="text-3xl font-bold text-primary mb-4">Order Confirmed!</h1>
-            <p className="text-gray-600 mb-6">Thank you for your order. We'll contact you soon to confirm the payment via PhonePe.</p>
-            <p className="text-sm text-gray-500">Redirecting to home page...</p>
+            
+            {paymentMethod === 'cod' ? (
+              <div>
+                <p className="text-gray-600 mb-4">Your order has been placed successfully!</p>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                  <p className="text-green-800 font-semibold">💰 Pay on Delivery</p>
+                  <p className="text-sm text-green-700 mt-2">You can pay ₹{total + 99} when the delivery person arrives at your door.</p>
+                </div>
+                <p className="text-sm text-gray-600">We'll contact you soon with tracking details.</p>
+              </div>
+            ) : (
+              <div>
+                <p className="text-gray-600 mb-4">Your order has been placed successfully!</p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <p className="text-blue-800 font-semibold">💳 Payment Required</p>
+                  <p className="text-sm text-blue-700 mt-2">We'll send you a PhonePe payment link shortly.</p>
+                </div>
+              </div>
+            )}
+            
+            <p className="text-sm text-gray-500 mt-4">Redirecting to home page...</p>
           </div>
         </main>
         <Footer />
@@ -207,6 +228,41 @@ export default function Checkout() {
                   />
                 </div>
 
+                <h3 className="text-lg font-bold text-primary mt-8 mb-4">Payment Method</h3>
+
+                {/* Payment Method Options */}
+                <div className="space-y-3">
+                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer transition" style={{borderColor: paymentMethod === 'cod' ? '#8B7355' : '#e5e7eb'}}>
+                    <input 
+                      type="radio" 
+                      name="payment"
+                      value="cod"
+                      checked={paymentMethod === 'cod'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4"
+                    />
+                    <span className="ml-3">
+                      <span className="font-semibold text-primary">💰 Pay on Delivery</span>
+                      <p className="text-sm text-gray-600">Pay when you receive your order</p>
+                    </span>
+                  </label>
+
+                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer transition" style={{borderColor: paymentMethod === 'phonepe' ? '#8B7355' : '#e5e7eb'}}>
+                    <input 
+                      type="radio" 
+                      name="payment"
+                      value="phonepe"
+                      checked={paymentMethod === 'phonepe'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4"
+                    />
+                    <span className="ml-3">
+                      <span className="font-semibold text-primary">💳 PhonePe</span>
+                      <p className="text-sm text-gray-600">Pay now using PhonePe app</p>
+                    </span>
+                  </label>
+                </div>
+
                 <button 
                   type="submit"
                   className="w-full bg-secondary text-white py-3 rounded-lg font-bold hover:bg-opacity-90 transition mt-6"
@@ -249,8 +305,15 @@ export default function Checkout() {
                 </div>
               </div>
 
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-800"><strong>💳 Payment:</strong> You'll receive a PhonePe payment link after confirming your order.</p>
+              <div className="mt-6 p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-green-800">
+                  <strong>✅ {paymentMethod === 'cod' ? '💰 Pay on Delivery' : '💳 PhonePe Payment'}</strong>
+                  <br/>
+                  {paymentMethod === 'cod' 
+                    ? 'Pay ₹' + (total + 99) + ' when your order arrives'
+                    : 'You\'ll receive a payment link after placing order'
+                  }
+                </p>
               </div>
             </div>
           </div>
