@@ -3,17 +3,16 @@ import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ProductCard from '../components/ProductCard'
-import { products } from '../data/products'
+import { products, collections } from '../data/products'
 
 export default function Products() {
   const [cartCount, setCartCount] = useState(0)
   const [cart, setCart] = useState([])
-  const [selectedCategory, setSelectedCategory] = useState('All')
+  const [selectedCollection, setSelectedCollection] = useState('All')
 
-  const categories = ['All', ...new Set(products.map(p => p.category))]
-  const filteredProducts = selectedCategory === 'All' 
+  const filteredProducts = selectedCollection === 'All' 
     ? products 
-    : products.filter(p => p.category === selectedCategory)
+    : products.filter(p => p.collection === selectedCollection)
 
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('cart')) || []
@@ -39,21 +38,32 @@ export default function Products() {
       <Header cartCount={cartCount} />
 
       <main className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-primary mb-8">Our Products</h1>
+        <h1 className="text-4xl font-bold text-primary mb-2">Our Collections</h1>
+        <p className="text-gray-600 mb-8">Handmade with love, crafted with care</p>
 
-        {/* Category Filter */}
-        <div className="mb-8 flex flex-wrap gap-2">
-          {categories.map(category => (
+        {/* Collection Filter */}
+        <div className="mb-12 flex flex-wrap gap-3">
+          <button
+            onClick={() => setSelectedCollection('All')}
+            className={`px-6 py-2 rounded-full font-semibold transition ${
+              selectedCollection === 'All'
+                ? 'bg-primary text-white'
+                : 'bg-gray-200 text-primary hover:bg-gray-300'
+            }`}
+          >
+            All Collections
+          </button>
+          {collections.map(collection => (
             <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
+              key={collection.name}
+              onClick={() => setSelectedCollection(collection.name)}
               className={`px-6 py-2 rounded-full font-semibold transition ${
-                selectedCategory === category
+                selectedCollection === collection.name
                   ? 'bg-primary text-white'
                   : 'bg-gray-200 text-primary hover:bg-gray-300'
               }`}
             >
-              {category}
+              {collection.emoji} {collection.name}
             </button>
           ))}
         </div>
@@ -68,6 +78,12 @@ export default function Products() {
             />
           ))}
         </div>
+
+        {filteredProducts.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-600 text-lg">No products in this collection yet.</p>
+          </div>
+        )}
       </main>
 
       <Footer />
